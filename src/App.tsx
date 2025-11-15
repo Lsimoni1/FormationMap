@@ -10,11 +10,11 @@ function App() {
 
   return (
     <>
-      <ToolProvider>
+      {/* <ToolProvider>
         <StageDiagram/>
         <FloatingToolbar/>
-      </ToolProvider>    
-      {/* <Login/> */}
+      </ToolProvider>     */}
+      <Login/>
     </>
   );
 }

@@ -3,6 +3,7 @@ import StageDiagram from "./components/StageDiagram";
 import FloatingToolbar from "./components/FloatingToolbar";
 import {ToolProvider} from "./contexts/ToolContext";
 import { Login } from "./pages/Login";
+import { Register } from "./pages/Register";
 import "./App.css";
 
 function App() {
@@ -14,7 +15,7 @@ function App() {
         <StageDiagram/>
         <FloatingToolbar/>
       </ToolProvider>     */}
-      <Login/>
+      <Register/>
     </>
   );
 }

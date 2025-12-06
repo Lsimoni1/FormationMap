@@ -1,8 +1,10 @@
 import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSet } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
-export const Login = () => {
+export const Register = () => {
   return (
     <div className = "grid place-items-center min-h-screen">
       <div className="flex flex-col items-center space-y-4 max-w-md w-full">
@@ -18,11 +20,18 @@ export const Login = () => {
 
                 <Field>
                   <FieldLabel htmlFor="username">Username</FieldLabel>
+                  <FieldDescription> Enter a username below. </FieldDescription>
                   <Input id="username" type="text" placeholder="username" />
                 </Field>
 
                 <Field>
                   <FieldLabel htmlFor="password">Password</FieldLabel>
+                    <FieldDescription> 
+                        Passwords must include: <br/>
+                        8 or more characters  <br/>
+                        a special character    <br/>
+                        1 or more uppercase letter
+                    </FieldDescription> 
                   <Input id="password" type="password" placeholder="••••••••" />
                 </Field>
 
@@ -30,17 +39,16 @@ export const Login = () => {
             </FieldSet>
 
             <Button className = "block w-full">
-              Log In
+              Create Account
             </Button>
-
-            <a href="/create-account" 
-            className="text-sm text-blue-500 hover:underline ">
-              Don't have an account? Create one
-            </a>
         </div>
+
+        <Label>
+           <Checkbox/> Checking this box allows Formation Map to send you promotional emails and messages.
+        </Label>
       </div>
     </div>
   )
 }
 
-export default Login;
+export default Register;

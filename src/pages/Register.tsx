@@ -26,12 +26,19 @@ export const Register = () => {
 
                 <Field>
                   <FieldLabel htmlFor="password">Password</FieldLabel>
-                    <FieldDescription> 
-                        Passwords must include: <br/>
-                        8 or more characters  <br/>
-                        a special character    <br/>
-                        1 or more uppercase letter
+                    <FieldDescription>                         
+                      Passwords must include: 
+                      <ul className = "list-disc list-inside pl-4">
+                        <li> 8 or more characters </li>
+                        <li> a special character </li>    
+                        <li> 1 or more uppercase letter </li>
+                      </ul>
                     </FieldDescription> 
+                  <Input id="password" type="password" placeholder="••••••••" />
+                </Field>
+
+                <Field>
+                  <FieldDescription> Confirm Password </FieldDescription>
                   <Input id="password" type="password" placeholder="••••••••" />
                 </Field>
 

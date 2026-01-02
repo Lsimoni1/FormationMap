@@ -1,6 +1,7 @@
 import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSet } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Link } from "react-router-dom";
 
 export const Login = () => {
   return (
@@ -33,10 +34,10 @@ export const Login = () => {
               Log In
             </Button>
 
-            <a href="/create-account" 
+            <Link to="/register"
             className="text-sm text-blue-500 hover:underline ">
               Don't have an account? Create one
-            </a>
+            </Link>
         </div>
       </div>
     </div>

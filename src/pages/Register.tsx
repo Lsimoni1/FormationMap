@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Link } from "react-router-dom";
 
 export const Register = () => {
   return (
@@ -48,6 +49,11 @@ export const Register = () => {
             <Button className = "block w-full">
               Create Account
             </Button>
+
+            <Link to="/login"
+              className="text-sm text-blue-500 hover:underline ">
+              Already have an account? Log in 
+            </Link>
         </div>
 
         <Label>

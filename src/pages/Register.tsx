@@ -23,7 +23,7 @@ export const Register = () => {
     setError("");
 
     if(password !== confirmPassword) {
-      setError("passwords do not match");
+      // setError("passwords do not match");
       setLoading(false);
       return;
     }

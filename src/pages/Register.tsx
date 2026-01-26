@@ -17,6 +17,13 @@ export const Register = () => {
   const { signUp } = useAuth();
   const navigate = useNavigate();
 
+  //validate passwords
+  const hasMinLength = password.length >= 8;
+  const hasUppercase = /[A-Z]/.test(password);
+  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+  const isFormValid = hasMinLength && hasUppercase && hasSpecialChar &&
+   password === confirmPassword && email.length > 0;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -65,10 +72,10 @@ export const Register = () => {
                   <FieldLabel htmlFor="password">Password</FieldLabel>
                     <FieldDescription>                         
                       Passwords must include: 
-                      <ul className = "list-disc list-inside pl-4">
-                        <li> 8 or more characters </li>
-                        <li> a special character </li>    
-                        <li> 1 or more uppercase letter </li>
+                      <ul>
+                        <li className={hasMinLength ? "text-green-600" : ""}> {hasMinLength ? "✓" : "○"} 8 or more characters </li>
+                        <li className={hasSpecialChar ? "text-green-600" : ""}> {hasSpecialChar ? "✓" : "○"} a special character </li>    
+                        <li className={hasUppercase ? "text-green-600" : ""}> {hasUppercase ? "✓" : "○"} 1 or more uppercase letter </li>
                       </ul>
                     </FieldDescription> 
                   <Input 
@@ -96,7 +103,7 @@ export const Register = () => {
 
             {confirmPassword && password !== confirmPassword && <p className="text-orange-500 text-sm">Passwords do not match</p>}
 
-            <Button type="submit" className = "block w-full" disabled={loading}>
+            <Button type="submit" className = "block w-full" disabled={!isFormValid || loading}>
               Create Account
             </Button>
 

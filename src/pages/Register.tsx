@@ -70,11 +70,11 @@ export const Register = () => {
 
                 <Field>
                   <FieldLabel htmlFor="password">Password</FieldLabel>
-                    <FieldDescription>                         
-                      Passwords must include: 
-                      <ul>
+                    <FieldDescription>
+                      Passwords must include:
+                      <ul className="ml-4">
                         <li className={hasMinLength ? "text-green-600" : ""}> {hasMinLength ? "✓" : "○"} 8 or more characters </li>
-                        <li className={hasSpecialChar ? "text-green-600" : ""}> {hasSpecialChar ? "✓" : "○"} a special character </li>    
+                        <li className={hasSpecialChar ? "text-green-600" : ""}> {hasSpecialChar ? "✓" : "○"} a special character </li>
                         <li className={hasUppercase ? "text-green-600" : ""}> {hasUppercase ? "✓" : "○"} 1 or more uppercase letter </li>
                       </ul>
                     </FieldDescription> 

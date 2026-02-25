@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight, AlignJustify, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Field, FieldLabel } from '@/components/ui/field'
 import { useAuth } from '@/contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
 
@@ -102,18 +104,60 @@ const ProjectCard = ({ project, onClick, isMenuOpen, onMenuToggle }: ProjectCard
   </div>
 )
 
+interface NewProjectModalProps {
+  onClose: () => void
+}
+
+const NewProjectModal = ({ onClose }: NewProjectModalProps) => {
+  const navigate = useNavigate()
+  const [projectName, setProjectName] = useState('')
+  const [error, setError] = useState('')
+
+  // TODO(human): Update handleCreate — instead of silently returning when the
+  // name is empty, call setError() with a helpful message so the user knows
+  // what went wrong. The error display and clearing are already wired up below.
+  const handleCreate = () => {
+    const trimmed = projectName.trim()
+    if(trimmed === "") { 
+      setError("Project names cannot be empty")
+      return 
+    }
+    navigate('/canvas', {state: { projectName: trimmed} })
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div className="bg-background border-2 rounded-md p-6 w-full max-w-md mx-4">
+        <h2 className="text-xl font-bold mb-4">New Project</h2>
+        <Field>
+          <FieldLabel htmlFor="project-name">Project Name</FieldLabel>
+          <Input
+            id="project-name"
+            value={projectName}
+            onChange={(e) => { setProjectName(e.target.value); setError('') }}
+            onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
+            placeholder="e.g. Spring Show 2026"
+            autoFocus
+          />
+          {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+        </Field>
+        <div className="flex gap-2 justify-end mt-6">
+          <Button variant="outline" onClick={onClose}>Cancel</Button>
+          <Button onClick={handleCreate}>Create</Button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 const Dashboard = () => {
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
   const [currentPage, setCurrentPage] = useState(0)
   const [showAccountMenu, setShowAccountMenu] = useState(false)
+  const [showNewProjectModal, setShowNewProjectModal] = useState(false)
+  const [currCardSelected, setCurrCardSelected] = useState('')
   const itemsPerPage = useResponsiveItemsPerPage()
-
-  // TODO(human): Add state here to track which card's options menu is open.
-  // A boolean won't work across multiple cards — you need to know *which* card
-  // is open, not just whether one is open. Consider what type and initial value
-  // makes sense given that no menu starts open.
-  const [currCardSelected, setCurrCardSelected] = useState("") 
 
   // Reset to first page whenever the grid layout changes
   useEffect(() => {
@@ -131,7 +175,7 @@ const Dashboard = () => {
         <h1 className="text-5xl text-center text-bold">Your Projects</h1>
 
         <div className="absolute top-8 left-10">
-          <Button onClick={() => navigate('/canvas')}>
+          <Button onClick={() => setShowNewProjectModal(true)}>
             <Plus /> New Project
           </Button>
         </div>
@@ -183,13 +227,10 @@ const Dashboard = () => {
                   <ProjectCard
                     key={project.id}
                     project={project}
-                    onClick={() => navigate('/canvas') }     
-                    // TODO(human): replace these placeholders with your state —
-                    // isMenuOpen should be true only for the card whose id matches
-                    // the open menu, and onMenuToggle should update that state
-                    isMenuOpen={currCardSelected === project.id} 
-                    onMenuToggle={() => { 
-                      setCurrCardSelected(currCardSelected === project.id ? "" : project.id)
+                    onClick={() => navigate('/canvas')}
+                    isMenuOpen={currCardSelected === project.id}
+                    onMenuToggle={() => {
+                      setCurrCardSelected(currCardSelected === project.id ? '' : project.id)
                     }}
                   />
                 ))
@@ -228,6 +269,10 @@ const Dashboard = () => {
           </div>
         )}
       </div>
+
+      {showNewProjectModal && (
+        <NewProjectModal onClose={() => setShowNewProjectModal(false)} />
+      )}
     </div>
   )
 }

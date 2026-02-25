@@ -13,7 +13,7 @@ communication issues and therefore inefficient use of time during rehearsals/mee
 
 ## Solution
 
-Formation Map allows choreographers to create formations on a gridded canvas that will represent a stage
+Formation Map allows choreographers to create formations on a gridded canvas that represents a stage
 or performance area. The choreographer is able to modify the orientation of dancers, group dancers together,
 add names for dancers, and use all of these features to save a snapshot of that moment in the performance.
 From there, they can create a new formation from the previous one and track the intended transition

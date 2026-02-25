@@ -12,6 +12,8 @@ A running log of thoughts, ideas, bugs, and progress.
 
 ---
 
+
+
 <!--
 TIP: Keep entries dated and append-only.
 Don't worry about polish here - this is your thinking space.

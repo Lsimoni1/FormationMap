@@ -113,9 +113,6 @@ const NewProjectModal = ({ onClose }: NewProjectModalProps) => {
   const [projectName, setProjectName] = useState('')
   const [error, setError] = useState('')
 
-  // TODO(human): Update handleCreate — instead of silently returning when the
-  // name is empty, call setError() with a helpful message so the user knows
-  // what went wrong. The error display and clearing are already wired up below.
   const handleCreate = () => {
     const trimmed = projectName.trim()
     if(trimmed === "") { 

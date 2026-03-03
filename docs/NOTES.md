@@ -29,6 +29,55 @@ A running log of thoughts, ideas, bugs, and progress.
 
 ---
 
+## 2026-02-26
+
+- started working on the settings page, but asking claude to force me to write more code myself:
+  - working on a light/dark mode for a preferences setting. Started with a themeContext and wrote ThemeProvider
+    - things to remember:
+      - useEffect -> a function that runs once per mount, and again for every time a value within the dependency array
+                    is changed (if no value included in the dependency array '[]' the useEffect function will only run once per 
+                    mount). a return statement may be added as a cleanup function, which means that when a new useEffect
+                    is triggered by a dependency change, the previous useEffect instance is destroyed and its return statement 
+                    is run. This allows any values that need to be reset to be reset before the new useEffect instance runs.
+
+                    useEffect( (#parameters) => {
+                      #function code
+
+                      return () => {
+                        #return function
+                      }
+                    }, [#dependency array])
+      - element.classList.toggle(value, boolean statement) -> allows a CSS class to be included or removed from an element based
+                                                              on the value of the boolean statement included
+                                                        
+
+---
+
+## 2026-03-02 && 2026-02-27
+
+ - Continued work on the settings page, wrote a lot of the CSS myself which is difficult for me
+ - Things to remember for CSS:
+    - thought process around layout and parent-child structure of components (box-drawing exercise)
+    - tailwind and CSS are different
+    - cn() -> allows conditional selection of Tailwind className attributes. 
+
+              className = {cn('regular attributes for className', conditional statement ? 'additional attributes' : '')}
+
+              this structure allows the developer to include additional attributes to a className depending on whether a 
+              conditional statement is met.
+    - Typescript 'as' keyword -> allows a value of a broad type to be affirmed by the developer to conform to the rules of 
+                                a more specific type. Here's an example from the codebase in ThemeContext.tsx:
+
+                                let tempTheme = localStorage.getItem('theme')
+                                if(tempTheme === null) {localStorage.setItem('theme', theme)}
+                                else {setTheme(tempTheme as Theme)}
+
+ - nothing super significant learned in this session, just don't forget where {} will be needed for jsx in react, 
+  passing into onClick needs to make sure to include () =>. Small lapses in existing knowledge
+
+
+---
+
 
 
 <!--

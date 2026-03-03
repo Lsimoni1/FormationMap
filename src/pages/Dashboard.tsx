@@ -202,6 +202,12 @@ const Dashboard = () => {
               >
                 Sign out
               </Button>
+              <Button
+                variant="ghost"
+                className="w-full justify-start rounded-t-none text-sm rounded-b-none"
+                onClick={() => navigate('/settings')}>
+                  Settings
+              </Button>
             </div>
           )}
         </div>

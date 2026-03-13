@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, type ReactNode, useRef } from 'react'
 
 type Theme = 'light' | 'dark'
 
@@ -11,6 +11,7 @@ const ThemeContext = createContext<ThemeContextValue | null>(null)
 
 export const ThemeProvider = ({children} : {children: ReactNode}) => {
   const [theme, setTheme] = useState<Theme> ("light");
+  const hasMounted = useRef(false);
 
   useEffect(() => {
     let tempTheme = localStorage.getItem('theme')
@@ -20,6 +21,10 @@ export const ThemeProvider = ({children} : {children: ReactNode}) => {
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === 'dark')
+    if(!hasMounted.current) {
+      hasMounted.current = true
+      return
+    }
     localStorage.setItem("theme", theme)
   }, [theme])
 

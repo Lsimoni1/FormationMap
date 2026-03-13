@@ -78,6 +78,61 @@ A running log of thoughts, ideas, bugs, and progress.
 
 ---
 
+## 2026-03-05
+
+- Worked on a bug with the light preference to where refresh would reset the preference selection:
+- code before:
+
+  useEffect(() => {
+    let tempTheme = localStorage.getItem('theme')
+    if(tempTheme === null) {localStorage.setItem('theme', theme)}
+    else {setTheme(tempTheme as Theme)}
+  }, [])
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", theme === 'dark')
+    localStorage.setItem("theme", theme)
+  }, [theme])
+
+- code after:
+
+  const hasMounted = useRef(false);
+
+  useEffect(() => {
+    let tempTheme = localStorage.getItem('theme')
+    if(tempTheme === null) {localStorage.setItem('theme', theme)}
+    else {setTheme(tempTheme as Theme)}
+  }, [])
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", theme === 'dark')
+    if(!hasMounted.current) {
+      hasMounted.current = true
+      return
+    }
+    localStorage.setItem("theme", theme)
+  }, [theme])
+
+- the issue came from an issue in the way the code was running upon mount. Before, the application would
+always reset to light mode upon refresh and here's why:
+    - on mount:
+    
+      The first useEffect runs. If light, theme is queued to be set to light. If dark, theme is queued to be set to dark. 
+      The second useEffect runs. Since the first useEffect state change hasn't run yet (queued for after the code block), the 
+      theme will be default to light and the document.documentElement.classList.toggle("dark", false) will always run. Then,
+      the second useEffect will change the theme in localStorage to be set to light. So after mount, the first useEffect
+      queue will set the theme state to "dark", and then the second useEffect code will reassign it in localStorage to "light". 
+      Then, when the first useEffect reads localStorage again it will read it as light and the theme will be reset.
+
+- the solution to this issue ended up being to manually ensure that the second useEffect does not run on mount, therefore 
+never reassigning localStorage to "light" after the first useEffect's queued code runs. Now, the second useEffect will only be run
+upon theme changing.
+
+- reminder: state changes are asynchronous, useEffect code is not inherently asynchronous
+
+---
+
+
 
 
 <!--

@@ -42,6 +42,110 @@ A running log of thoughts, ideas, bugs, and progress.
   card
 to do next:
   - start figuring out how to save formations and give that jsonb information to the db 
+## 2026-02-26
+
+- started working on the settings page, but asking claude to force me to write more code myself:
+  - working on a light/dark mode for a preferences setting. Started with a themeContext and wrote ThemeProvider
+    - things to remember:
+      - useEffect -> a function that runs once per mount, and again for every time a value within the dependency array
+                    is changed (if no value included in the dependency array '[]' the useEffect function will only run once per 
+                    mount). a return statement may be added as a cleanup function, which means that when a new useEffect
+                    is triggered by a dependency change, the previous useEffect instance is destroyed and its return statement 
+                    is run. This allows any values that need to be reset to be reset before the new useEffect instance runs.
+
+                    useEffect( (#parameters) => {
+                      #function code
+
+                      return () => {
+                        #return function
+                      }
+                    }, [#dependency array])
+      - element.classList.toggle(value, boolean statement) -> allows a CSS class to be included or removed from an element based
+                                                              on the value of the boolean statement included
+                                                        
+
+---
+
+## 2026-03-02 && 2026-02-27
+
+ - Continued work on the settings page, wrote a lot of the CSS myself which is difficult for me
+ - Things to remember for CSS:
+    - thought process around layout and parent-child structure of components (box-drawing exercise)
+    - tailwind and CSS are different
+    - cn() -> allows conditional selection of Tailwind className attributes. 
+
+              className = {cn('regular attributes for className', conditional statement ? 'additional attributes' : '')}
+
+              this structure allows the developer to include additional attributes to a className depending on whether a 
+              conditional statement is met.
+    - Typescript 'as' keyword -> allows a value of a broad type to be affirmed by the developer to conform to the rules of 
+                                a more specific type. Here's an example from the codebase in ThemeContext.tsx:
+
+                                let tempTheme = localStorage.getItem('theme')
+                                if(tempTheme === null) {localStorage.setItem('theme', theme)}
+                                else {setTheme(tempTheme as Theme)}
+
+ - nothing super significant learned in this session, just don't forget where {} will be needed for jsx in react, 
+  passing into onClick needs to make sure to include () =>. Small lapses in existing knowledge
+
+
+---
+
+## 2026-03-05
+
+- Worked on a bug with the light preference to where refresh would reset the preference selection:
+- code before:
+
+  useEffect(() => {
+    let tempTheme = localStorage.getItem('theme')
+    if(tempTheme === null) {localStorage.setItem('theme', theme)}
+    else {setTheme(tempTheme as Theme)}
+  }, [])
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", theme === 'dark')
+    localStorage.setItem("theme", theme)
+  }, [theme])
+
+- code after:
+
+  const hasMounted = useRef(false);
+
+  useEffect(() => {
+    let tempTheme = localStorage.getItem('theme')
+    if(tempTheme === null) {localStorage.setItem('theme', theme)}
+    else {setTheme(tempTheme as Theme)}
+  }, [])
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", theme === 'dark')
+    if(!hasMounted.current) {
+      hasMounted.current = true
+      return
+    }
+    localStorage.setItem("theme", theme)
+  }, [theme])
+
+- the issue came from an issue in the way the code was running upon mount. Before, the application would
+always reset to light mode upon refresh and here's why:
+    - on mount:
+    
+      The first useEffect runs. If light, theme is queued to be set to light. If dark, theme is queued to be set to dark. 
+      The second useEffect runs. Since the first useEffect state change hasn't run yet (queued for after the code block), the 
+      theme will be default to light and the document.documentElement.classList.toggle("dark", false) will always run. Then,
+      the second useEffect will change the theme in localStorage to be set to light. So after mount, the first useEffect
+      queue will set the theme state to "dark", and then the second useEffect code will reassign it in localStorage to "light". 
+      Then, when the first useEffect reads localStorage again it will read it as light and the theme will be reset.
+
+- the solution to this issue ended up being to manually ensure that the second useEffect does not run on mount, therefore 
+never reassigning localStorage to "light" after the first useEffect's queued code runs. Now, the second useEffect will only be run
+upon theme changing.
+
+- reminder: state changes are asynchronous, useEffect code is not inherently asynchronous
+
+---
+
+
 
 
 <!--

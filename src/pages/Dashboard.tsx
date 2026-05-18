@@ -5,6 +5,8 @@ import { Input } from '@/components/ui/input'
 import { Field, FieldLabel } from '@/components/ui/field'
 import { useAuth } from '@/contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
+import { supabase } from '@/lib/supabase'
+import { Spinner } from '@/components/ui/spinner'
 
 // Columns follow Tailwind breakpoints (sm: 640px, lg: 1024px)
 // Rows collapse to 1 on short viewports so the page scroller stays visible
@@ -33,16 +35,6 @@ interface Project {
   formationCount: number
 }
 
-const MOCK_PROJECTS: Project[] = [
-  { id: '1', title: 'Spring Show 2026', lastEdited: '2026-02-20', formationCount: 12 },
-  { id: '2', title: 'Fall Recital', lastEdited: '2026-02-15', formationCount: 8 },
-  { id: '3', title: 'Competition Piece', lastEdited: '2026-02-10', formationCount: 5 },
-  { id: '4', title: 'Workshop Demo', lastEdited: '2026-02-05', formationCount: 3 },
-  { id: '5', title: 'Summer Camp', lastEdited: '2026-01-30', formationCount: 7 },
-  { id: '6', title: 'Showcase Finale', lastEdited: '2026-01-25', formationCount: 15 },
-  { id: '7', title: 'Test Project', lastEdited: '2026-01-20', formationCount: 2 },
-]
-
 function getVisibleProjects(projects: Project[], currentPage: number, itemsPerPage: number): Project[] {
   let targetIndex = itemsPerPage * currentPage
   return projects.slice(targetIndex, targetIndex + itemsPerPage)
@@ -53,38 +45,44 @@ interface ProjectCardProps {
   onClick: () => void
   isMenuOpen: boolean
   onMenuToggle: () => void
+  onDelete: () => void 
+  onRename: (projectId: string, newName: string) => void
 }
 
-const ProjectCard = ({ project, onClick, isMenuOpen, onMenuToggle }: ProjectCardProps) => (
-  <div
+const ProjectCard = ({ project, onClick, isMenuOpen, onMenuToggle, onDelete, onRename }: ProjectCardProps) => {
+  const [renameActive, setRenameActive] = useState(false)
+  const [newName, setNewName] = useState(project.title)
+
+  return (
+    <div
     className="relative border-2 rounded-md p-4 hover:shadow-md transition-shadow cursor-pointer"
     onClick={onClick}
-  >
-    <Button
-      variant="ghost"
-      size="icon-sm"
-      aria-label="Project options"
-      className="absolute top-2 right-2"
-      onClick={(e) => { e.stopPropagation(); onMenuToggle() }}
     >
-      <AlignJustify />
-    </Button>
-    {isMenuOpen && (
-      <div className="absolute top-10 right-2 w-32 bg-background border-2 rounded-md shadow-lg z-10">
-        <Button
-          variant="ghost"
-          className="w-full justify-start text-sm rounded-b-none"
-          onClick={(e) => e.stopPropagation()}
-        >
-          Rename
-        </Button>
-        <Button
-          variant="ghost"
-          className="w-full justify-start text-sm text-destructive rounded-t-none hover:text-destructive"
-          onClick={(e) => e.stopPropagation()}
-        >
-          Delete
-        </Button>
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        aria-label="Project options"
+        className="absolute top-2 right-2"
+        onClick={(e) => { e.stopPropagation(); onMenuToggle() }}
+      >
+        <AlignJustify />
+      </Button>
+      {isMenuOpen && (
+        <div className="absolute top-10 right-2 w-32 bg-background border-2 rounded-md shadow-lg z-10">
+          <Button
+            variant="ghost"
+            className="w-full justify-start text-sm rounded-b-none"
+            onClick={(e) => {e.stopPropagation(); setRenameActive(true)}}
+          >
+            Rename
+          </Button>
+          <Button
+            variant="ghost"
+            className="w-full justify-start text-sm text-destructive rounded-t-none hover:text-destructive"
+            onClick={(e) => { e.stopPropagation(); onDelete() }}
+          >
+            Delete
+          </Button>
       </div>
     )}
     <div className="w-full aspect-[4/3] rounded bg-gray-200 flex items-center justify-center">
@@ -98,11 +96,20 @@ const ProjectCard = ({ project, onClick, isMenuOpen, onMenuToggle }: ProjectCard
         />
       </svg>
     </div>
-    <h3 className="font-bold mt-3">{project.title}</h3>
+    {renameActive ? 
+      <Input
+        className='font-bold mt-3'
+        value={newName}
+        onChange={(e) =>  setNewName(e.target.value)}
+        onClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => { if(e.key === "Enter") {onRename(project.id, newName); setRenameActive(false)}}}
+      /> 
+      : < h3 className="font-bold mt-3">{project.title}</h3> }
     <p className="text-sm text-muted-foreground mt-0.5">Last Edited: {project.lastEdited}</p>
     <p className="text-sm text-muted-foreground">Number of Formations: {project.formationCount}</p>
   </div>
-)
+  )
+}
 
 interface NewProjectModalProps {
   onClose: () => void
@@ -113,13 +120,20 @@ const NewProjectModal = ({ onClose }: NewProjectModalProps) => {
   const [projectName, setProjectName] = useState('')
   const [error, setError] = useState('')
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     const trimmed = projectName.trim()
     if(trimmed === "") { 
       setError("Project names cannot be empty")
       return 
     }
-    navigate('/canvas', {state: { projectName: trimmed} })
+    const { error } = await supabase
+      .from ("projects")
+      .insert({ name: trimmed})
+    if (error != null) {
+      setError("New project creation failed")
+    } else {
+      navigate('/canvas', {state: { projectName: trimmed} })
+    }
   }
 
   return (
@@ -154,6 +168,8 @@ const Dashboard = () => {
   const [showAccountMenu, setShowAccountMenu] = useState(false)
   const [showNewProjectModal, setShowNewProjectModal] = useState(false)
   const [currCardSelected, setCurrCardSelected] = useState('')
+  const [projects , setProjects] = useState<Project[]>([])
+  const [loading, setLoading] = useState(true)
   const itemsPerPage = useResponsiveItemsPerPage()
 
   // Reset to first page whenever the grid layout changes
@@ -161,8 +177,59 @@ const Dashboard = () => {
     setCurrentPage(0)
   }, [itemsPerPage])
 
-  const totalPages = Math.ceil(MOCK_PROJECTS.length / itemsPerPage)
-  const visibleProjects = getVisibleProjects(MOCK_PROJECTS, currentPage, itemsPerPage)
+  useEffect(() => {
+    const fetchProjects = async () => {
+      setLoading(true)
+      const {data, error} = await supabase
+        .from("projects")
+        .select()
+      if(error != null) {
+        setLoading(false)
+        return
+      } else {
+        setProjects(data.map(row =>({
+            id: row.id, 
+            title: row.name,
+            lastEdited: "",
+            formationCount: 1
+          })))
+          setLoading(false)
+      }
+    }
+
+    fetchProjects()
+  }, [])
+
+  const deleteProjects = async (projectId: string) => {
+    const { error } = await supabase 
+      .from("projects")
+      .delete()
+      .eq('id', projectId)
+
+    if(error != null) {
+      return
+    } else {
+      setProjects(projects.filter((project) => project.id !== projectId)) 
+    }
+  }
+
+  const renameProjects = async (projectId: string, newName: string) => {
+    const { error } = await supabase
+      .from("projects")
+      .update({name: newName})
+      .eq('id', projectId)
+
+    if(error != null) {
+      console.log(error)
+      return
+
+    } else {
+      setProjects(projects.map((project) => project.id === projectId ? {...project, title: newName} : project))
+    }
+  }
+
+  const totalPages = Math.ceil(projects.length / itemsPerPage)
+  const visibleProjects = getVisibleProjects(projects, currentPage, itemsPerPage)
   const avatarLetter = user?.email?.[0].toUpperCase() ?? '?'
 
   return (
@@ -224,6 +291,12 @@ const Dashboard = () => {
           </Button>
 
           {/* Project grid */}
+
+          { loading ?
+                <div className="flex-1 flex items-center justify-center">                                                                                                                                                
+                  <Spinner className="h-10 w-10" />                                                                                                                                                                   
+                </div>    
+          :
           <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {visibleProjects.length > 0
               ? visibleProjects.map(project => (
@@ -235,6 +308,8 @@ const Dashboard = () => {
                     onMenuToggle={() => {
                       setCurrCardSelected(currCardSelected === project.id ? '' : project.id)
                     }}
+                    onDelete={() => deleteProjects(project.id)}
+                    onRename={renameProjects}
                   />
                 ))
               : (
@@ -243,7 +318,7 @@ const Dashboard = () => {
                 </p>
               )
             }
-          </div>
+          </div>}
 
           <Button
             variant="ghost"

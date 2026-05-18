@@ -41,7 +41,11 @@ Secondary users: Dancers/Performers (view formations/projects as informational r
 - [x] User authentication (login/register via Supabase)
 - [x] Protected routes for authenticated pages
 - [x] Password validation with real-time feedback
-- [ ] Home/landing page post-login
+- [x] Dashboard with project cards, pagination, and option menus
+- [x] Settings page with dark/light mode toggle and theme persistence
+- [x] New project creation persisted to Supabase
+- [x] Dashboard loads real projects from database
+- [x] Rename and delete projects via Supabase
 - [ ] Save formations to database
 - [ ] Multiple formation sequences (timeline)
 - [ ] Export/share functionality
@@ -107,14 +111,14 @@ Summarize key decisions (link to DECISIONS.md for details)
 - Authentication flow (Login, Register pages with Supabase)
 - Routing with protected routes
 - Password validation with visual feedback
-
-**In Progress:**
-- Dashboard page development
+- Dashboard with project cards, pagination, rename, delete, and create
+- Settings page with dark/light mode toggle and theme persistence
+- Projects table and formations table in Supabase with RLS policies
+- New project creation, fetching, renaming, and deleting via Supabase
 
 **Up Next:**
-- Home page with sign-out functionality
-- Settings page for user preferences
-- Data persistence (save formations to Supabase)
+- Save formations to Supabase database
+- Multiple formation sequences (timeline)
 - Testing setup (Vitest + React Testing Library)
 
 ## Lessons Learned
@@ -168,4 +172,4 @@ src/
 
 ---
 
-*Last updated: 2026-02-22*
+*Last updated: 2026-05-18*

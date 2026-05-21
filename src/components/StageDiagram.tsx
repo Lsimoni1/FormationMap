@@ -40,7 +40,11 @@ const StageGrid = ({ cellSize = 50, width, height }: GridProps) => {
   );
 };
 
-const StageDiagram = () => {
+interface stageDiagramProps {
+  projectId: string
+}
+
+const StageDiagram = ({projectId}: stageDiagramProps) => {
   const [dancers, setDancers] = useState<DancerProps[]>([]);
   const [preview, setPreview] = useState<DancerProps | null>(null);
   const [movingDancer, setMovingDancer] = useState<DancerProps | null>(null);

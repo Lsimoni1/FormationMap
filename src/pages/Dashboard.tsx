@@ -126,13 +126,14 @@ const NewProjectModal = ({ onClose }: NewProjectModalProps) => {
       setError("Project names cannot be empty")
       return 
     }
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from ("projects")
       .insert({ name: trimmed})
+      .select()
     if (error != null) {
       setError("New project creation failed")
     } else {
-      navigate('/canvas', {state: { projectName: trimmed} })
+      navigate(`/canvas/${data[0].id}`, {state: { projectName: trimmed} })
     }
   }
 
@@ -303,7 +304,7 @@ const Dashboard = () => {
                   <ProjectCard
                     key={project.id}
                     project={project}
-                    onClick={() => navigate('/canvas')}
+                    onClick={() => navigate(`/canvas/${project.id}`)}
                     isMenuOpen={currCardSelected === project.id}
                     onMenuToggle={() => {
                       setCurrCardSelected(currCardSelected === project.id ? '' : project.id)

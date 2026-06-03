@@ -18,7 +18,7 @@ function App() {
         <Route path="/register" element={<Register/>} />
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard/></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute><Settings/></ProtectedRoute>} />
-        <Route path="/canvas" element={<ProtectedRoute><Canvas/></ProtectedRoute>} />
+        <Route path="/canvas/:projectId" element={<ProtectedRoute><Canvas/></ProtectedRoute>} />
         <Route path="/" element={<Navigate to="/login" replace />} />
       </Routes>
     </AuthProvider>

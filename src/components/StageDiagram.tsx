@@ -4,6 +4,7 @@ import Dancer from "./Dancer";
 import { useTool } from "../contexts/ToolContext";
 import { createDancer } from "./Dancer";
 import type { DancerProps } from "./Dancer";
+import type { Formation } from "./FormationMenu";
 
 interface GridProps {
   cellSize?: number;
@@ -42,10 +43,14 @@ const StageGrid = ({ cellSize = 50, width, height }: GridProps) => {
 
 interface stageDiagramProps {
   projectId: string
+  dancers: DancerProps[]
+  setDancers: React.Dispatch<React.SetStateAction<DancerProps[]>>
+  currentFormationIndex: number | null
+  formations: Formation[]
 }
 
-const StageDiagram = ({projectId}: stageDiagramProps) => {
-  const [dancers, setDancers] = useState<DancerProps[]>([]);
+const StageDiagram = ({projectId, dancers, setDancers, currentFormationIndex, formations}: stageDiagramProps) => {
+  //const [dancers, setDancers] = useState<DancerProps[]>([]);
   const [preview, setPreview] = useState<DancerProps | null>(null);
   const [movingDancer, setMovingDancer] = useState<DancerProps | null>(null);
   const [rotatingDancer, setRotatingDancer] = useState<DancerProps | null>(
@@ -201,6 +206,16 @@ const StageDiagram = ({projectId}: stageDiagramProps) => {
       setOriginalRotation(undefined);
     }
   }, [selectedTool]);
+
+  // useEffect hook to listen for changes in currentFormationIndex, and update dancers accordingly
+  useEffect(() => {
+      if(currentFormationIndex !== null) {
+        const formationDancers = formations[currentFormationIndex].dancers;
+        setDancers(formationDancers);
+      } else {
+        setDancers([]);
+      }
+  }, [currentFormationIndex])
 
   return (
     <Stage

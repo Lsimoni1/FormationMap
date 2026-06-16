@@ -32,9 +32,11 @@ const FormationPreview = ({formation, index, isActive, onClick}:FormationPreview
 interface FormationMenuProps {
     isViewable: boolean
     formations: Formation[]
+    currentFormationIndex: number | null
+    setCurrentFormationIndex: React.Dispatch<React.SetStateAction<number | null>>
 }
 
-const FormationMenu = ({ isViewable, formations}: FormationMenuProps) => {
+const FormationMenu = ({ isViewable, formations, currentFormationIndex, setCurrentFormationIndex }: FormationMenuProps) => {
     if(formations.length === 0 && isViewable) {
         return (
             <div className="absolute right-0 top-0 h-full w-48 p-3 bg-background border-2">
@@ -53,8 +55,8 @@ const FormationMenu = ({ isViewable, formations}: FormationMenuProps) => {
                     key = {formation.id}
                     formation={formation}
                     index={formation.order_index}
-                    isActive={i === 0}
-                    onClick={() => console.log("clicked")}
+                    isActive={i === currentFormationIndex}
+                    onClick={() => i === currentFormationIndex ? setCurrentFormationIndex(null) : setCurrentFormationIndex(i)}
                 />
                 ))}
             </div>
